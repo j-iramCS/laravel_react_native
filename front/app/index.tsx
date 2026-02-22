@@ -1,219 +1,91 @@
-import React, { useEffect } from 'react';
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Animated,
-} from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
-import { Sparkles, ArrowRight, Layers } from 'lucide-react-native';
+import { useTheme } from '@/context/ThemeContext';
+import { ArrowRight, Layers } from 'lucide-react-native';
 
 export default function WelcomeScreen() {
     const router = useRouter();
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isLoading } = useAuth();
+    const { colors } = useTheme();
 
-    const fadeAnim = new Animated.Value(0);
-    const slideAnim = new Animated.Value(30);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(30)).current;
 
     useEffect(() => {
         Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 800,
-                useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 600,
-                useNativeDriver: true,
-            }),
+            Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+            Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
         ]).start();
     }, []);
 
-    useEffect(() => {
-        if (!isLoading && isAuthenticated) {
-            router.replace('/(tabs)');
-        }
-    }, [isLoading, isAuthenticated]);
-
     if (isLoading) {
         return (
-            <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Cargando...</Text>
+            <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+                <ActivityIndicator size="small" color={colors.textMuted} />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.content,
-                    { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-                ]}
-            >
-                {/* Logo */}
-                <View style={styles.logoContainer}>
-                    <Layers size={32} color="#6366F1" strokeWidth={1.5} />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+                <View style={[styles.logoContainer, { backgroundColor: colors.surface }]}>
+                    <Layers size={32} color={colors.icon} strokeWidth={1.5} />
                 </View>
 
-                <Text style={styles.title}>Starter Kit</Text>
-                <Text style={styles.subtitle}>
+                <Text style={[styles.title, { color: colors.text }]}>Starter Kit</Text>
+                <Text style={[styles.subtitle, { color: colors.textMuted }]}>
                     Tu base para construir{'\n'}aplicaciones modernas
                 </Text>
 
-                {/* Features */}
                 <View style={styles.featuresContainer}>
-                    <View style={styles.featureItem}>
-                        <View style={styles.featureDot} />
-                        <Text style={styles.featureText}>Autenticación lista</Text>
-                    </View>
-                    <View style={styles.featureItem}>
-                        <View style={styles.featureDot} />
-                        <Text style={styles.featureText}>Multiplataforma</Text>
-                    </View>
-                    <View style={styles.featureItem}>
-                        <View style={styles.featureDot} />
-                        <Text style={styles.featureText}>API conectada</Text>
-                    </View>
+                    {['Autenticacion lista', 'Multiplataforma', 'API conectada'].map((f, i) => (
+                        <View key={i} style={styles.featureItem}>
+                            <View style={[styles.featureDot, { backgroundColor: colors.text }]} />
+                            <Text style={[styles.featureText, { color: colors.textSecondary }]}>{f}</Text>
+                        </View>
+                    ))}
                 </View>
 
-                {/* Buttons */}
                 <TouchableOpacity
-                    style={styles.primaryButton}
+                    style={[styles.primaryButton, { backgroundColor: colors.primary }]}
                     onPress={() => router.push('/login')}
                     activeOpacity={0.7}
                 >
-                    <Text style={styles.primaryButtonText}>Iniciar Sesión</Text>
-                    <ArrowRight size={18} color="#fff" strokeWidth={2} />
+                    <Text style={[styles.primaryButtonText, { color: colors.primaryText }]}>Iniciar Sesion</Text>
+                    <ArrowRight size={18} color={colors.primaryText} strokeWidth={2} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={styles.secondaryButton}
+                    style={[styles.secondaryButton, { borderColor: colors.borderLight, backgroundColor: colors.background }]}
                     onPress={() => router.push('/register')}
                     activeOpacity={0.7}
                 >
-                    <Sparkles size={16} color="#6366F1" strokeWidth={2} />
-                    <Text style={styles.secondaryButtonText}>Crear Cuenta</Text>
+                    <Text style={[styles.secondaryButtonText, { color: colors.text }]}>Crear Cuenta</Text>
                 </TouchableOpacity>
             </Animated.View>
 
-            <Text style={styles.footer}>Laravel + React Native</Text>
+            <Text style={[styles.footer, { color: colors.textPlaceholder }]}>Laravel + React Native</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#FAFAFA',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FAFAFA',
-    },
-    loadingText: {
-        color: '#9CA3AF',
-        fontSize: 15,
-        fontWeight: '400',
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 32,
-    },
-    logoContainer: {
-        width: 72,
-        height: 72,
-        borderRadius: 20,
-        backgroundColor: '#EEF2FF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 28,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#111827',
-        marginBottom: 8,
-        letterSpacing: -0.5,
-    },
-    subtitle: {
-        fontSize: 15,
-        color: '#9CA3AF',
-        textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 36,
-    },
-    featuresContainer: {
-        gap: 12,
-        marginBottom: 44,
-        alignSelf: 'stretch',
-        paddingHorizontal: 20,
-    },
-    featureItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    featureDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#6366F1',
-    },
-    featureText: {
-        fontSize: 14,
-        color: '#6B7280',
-        fontWeight: '500',
-    },
-    primaryButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        backgroundColor: '#6366F1',
-        paddingVertical: 16,
-        paddingHorizontal: 32,
-        borderRadius: 14,
-        alignSelf: 'stretch',
-        marginHorizontal: 4,
-        marginBottom: 12,
-    },
-    primaryButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    secondaryButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        paddingVertical: 16,
-        paddingHorizontal: 32,
-        borderRadius: 14,
-        alignSelf: 'stretch',
-        marginHorizontal: 4,
-        borderWidth: 1.5,
-        borderColor: '#E5E7EB',
-        backgroundColor: '#fff',
-    },
-    secondaryButtonText: {
-        color: '#6366F1',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    footer: {
-        color: '#D1D5DB',
-        textAlign: 'center',
-        paddingBottom: 36,
-        fontSize: 12,
-        fontWeight: '500',
-    },
+    container: { flex: 1 },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    content: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
+    logoContainer: { width: 72, height: 72, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginBottom: 28 },
+    title: { fontSize: 28, fontWeight: '700', marginBottom: 8, letterSpacing: -0.5 },
+    subtitle: { fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 36 },
+    featuresContainer: { gap: 12, marginBottom: 44, alignSelf: 'stretch', paddingHorizontal: 20 },
+    featureItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    featureDot: { width: 6, height: 6, borderRadius: 3 },
+    featureText: { fontSize: 14, fontWeight: '500' },
+    primaryButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: 32, borderRadius: 14, alignSelf: 'stretch', marginHorizontal: 4, marginBottom: 12 },
+    primaryButtonText: { fontSize: 16, fontWeight: '600' },
+    secondaryButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: 32, borderRadius: 14, alignSelf: 'stretch', marginHorizontal: 4, borderWidth: 1.5 },
+    secondaryButtonText: { fontSize: 16, fontWeight: '600' },
+    footer: { textAlign: 'center', paddingBottom: 36, fontSize: 12, fontWeight: '500' },
 });

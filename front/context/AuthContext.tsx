@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
     apiLogin,
     apiRegister,
@@ -41,7 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Verificar si hay sesión activa al iniciar la app
     useEffect(() => {
         checkAuth();
     }, []);
@@ -61,28 +60,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    async function login(email: string, password: string) {
+    const login = useCallback(async (email: string, password: string) => {
         const response = await apiLogin(email, password);
         setUser(response.user);
-    }
+    }, []);
 
-    async function register(
+    const register = useCallback(async (
         name: string,
         email: string,
         password: string,
         password_confirmation: string
-    ) {
+    ) => {
         const response = await apiRegister(name, email, password, password_confirmation);
         setUser(response.user);
-    }
+    }, []);
 
-    async function logout() {
+    const logout = useCallback(async () => {
         try {
             await apiLogout();
         } finally {
             setUser(null);
         }
-    }
+    }, []);
 
     return (
         <AuthContext.Provider
