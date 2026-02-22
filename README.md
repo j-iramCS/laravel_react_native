@@ -52,9 +52,6 @@ cp .env.example .env
 # Generar key
 php artisan key:generate
 
-# Publicar migraciones de Sanctum
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
-
 # Ejecutar migraciones
 php artisan migrate
 
@@ -63,7 +60,7 @@ php artisan serve --host=0.0.0.0
 ```
 
 > El API estará corriendo en `http://localhost:8000`
-
+> ⚠️ **Nota importante:** Las migraciones de Sanctum **ya están incluidas** en el proyecto. NO ejecutes `php artisan vendor:publish` para Sanctum, causará migraciones duplicadas.
 ### 2. Frontend (React Native / Expo)
 
 ```bash
