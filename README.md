@@ -117,7 +117,7 @@ Para producción, edita `front/config/api.config.ts` y cambia la URL base.
 
 ---
 
-## 📦 Dependencias Principales del Frontend
+## Dependencias Principales del Frontend
 
 | Paquete | Uso |
 |---------|-----|
@@ -130,7 +130,7 @@ Para producción, edita `front/config/api.config.ts` y cambia la URL base.
 
 ---
 
-## 🚀 Cómo Crear un Nuevo Módulo (Paso a Paso)
+## Cómo Crear un Nuevo Módulo (Paso a Paso)
 
 Ejemplo: crear un módulo de **Notas**.
 
@@ -289,13 +289,13 @@ export default function NotesScreen() {
   const { colors } = useTheme();
   // ... tu lógica aquí
 
-  // ✅ Usar Toast para mensajes de éxito
+  // Usar Toast para mensajes de éxito
   Toast.show({ type: 'success', text1: 'Creada', text2: 'Nota creada correctamente' });
 
-  // ❌ Usar Toast para errores
+  // Usar Toast para errores
   Toast.show({ type: 'error', text1: 'Error', text2: 'No se pudo crear la nota' });
 
-  // ℹ️ Usar Toast para info
+  // Usar Toast para info
   Toast.show({ type: 'info', text1: 'Info', text2: 'Mensaje informativo' });
 }
 ```
@@ -334,7 +334,7 @@ const menuItems = [
 
 ---
 
-## 🎨 Sistema de Tema
+## Sistema de Tema
 
 El proyecto incluye un `ThemeContext` con soporte para **Claro**, **Oscuro** y **Sistema**.
 
@@ -366,28 +366,28 @@ const { colors, mode, setMode } = useTheme();
 
 ---
 
-## 🔔 Toast Notifications
+## Toast Notifications
 
 Usa `react-native-toast-message` para mostrar alertas bonitas en **web y móvil**:
 
 ```typescript
 import Toast from 'react-native-toast-message';
 
-// ✅ Éxito
+// Éxito
 Toast.show({
   type: 'success',
   text1: 'Guardado',
   text2: 'Los cambios se guardaron correctamente',
 });
 
-// ❌ Error
+// Error
 Toast.show({
   type: 'error',
   text1: 'Error',
   text2: 'No se pudo completar la operación',
 });
 
-// ℹ️ Información
+// Información
 Toast.show({
   type: 'info',
   text1: 'Aviso',
