@@ -3,8 +3,9 @@ import React from 'react';
 import { Platform, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react-native';
+import { LayoutDashboard, UserCircle, Settings, LogOut, CheckCircle2 } from 'lucide-react-native';
 import { usePathname, useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 // ─── Sidebar para Web ───────────────────────────────────────
 function WebSidebar({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ function WebSidebar({ children }: { children: React.ReactNode }) {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: UserCircle, label: 'Perfil', path: '/profile' },
+    { icon: CheckCircle2, label: 'Tareas', path: '/tasks' },
     { icon: Settings, label: 'Ajustes', path: '/settings' },
   ];
 
@@ -91,6 +93,13 @@ export default function TabLayout() {
           <Tabs.Screen name="index" />
           <Tabs.Screen name="profile" />
           <Tabs.Screen name="settings" />
+          <Tabs.Screen
+            name="tasks"
+            options={{
+              title: 'Tareas',
+              tabBarIcon: ({ color }) => <Ionicons size={28} name="checkmark-done" color={color} />,
+            }}
+          />
         </Tabs>
       </WebSidebar>
     );
@@ -134,6 +143,13 @@ export default function TabLayout() {
         options={{
           title: 'Ajustes',
           tabBarIcon: ({ color, size }) => <Settings size={size - 2} color={color} strokeWidth={1.5} />,
+        }}
+      />
+      <Tabs.Screen
+        name="tasks"
+        options={{
+          title: 'Tareas',
+          tabBarIcon: ({ color, size }) => <Ionicons size={size - 2} name="checkmark-done" color={color} />,
         }}
       />
     </Tabs>

@@ -1,37 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { apiClient, API_URL } from '@/config/axiosConfig';
 
 // ─── Configuración ──────────────────────────────────────────
-// Detecta automáticamente la IP de tu máquina de desarrollo
-// para que funcione en dispositivos físicos, emuladores y web.
-function getApiUrl(): string {
-  // En producción, cambia esto a tu URL de servidor real:
-  // return 'https://tu-dominio.com/api';
-
-  // Web siempre usa localhost
-  if (Platform.OS === 'web') {
-    return 'http://localhost:8000/api';
-  }
-
-  // En móvil, detectar IP automáticamente
-  const debuggerHost = Constants.expoGoConfig?.debuggerHost
-    ?? Constants.manifest2?.extra?.expoGo?.debuggerHost;
-
-  if (debuggerHost) {
-    const hostIp = debuggerHost.split(':')[0];
-    return `http://${hostIp}:8000/api`;
-  }
-
-  // Fallback
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:8000/api'; // Android emulator
-  }
-
-  return 'http://localhost:8000/api'; // iOS simulator
-}
-
-const API_URL = getApiUrl();
+export { API_URL, apiClient };
 
 const TOKEN_KEY = 'auth_token';
 
@@ -48,7 +19,7 @@ async function removeToken(): Promise<void> {
   await AsyncStorage.removeItem(TOKEN_KEY);
 }
 
-async function authHeaders(): Promise<Record<string, string>> {
+export async function authHeaders(): Promise<Record<string, string>> {
   const token = await getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -87,63 +58,49 @@ export async function apiRegister(
   password: string,
   password_confirmation: string
 ): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ name, email, password, password_confirmation }),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw data as ApiError;
+  try {
+    const { data } = await apiClient.post('/register', {
+      name,
+      email,
+      password,
+      password_confirmation,
+    });
+    await setToken(data.token);
+    return data;
+  } catch (error: any) {
+    throw error.response?.data as ApiError;
   }
-
-  await setToken(data.token);
-  return data;
 }
 
 export async function apiLogin(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw data as ApiError;
+  try {
+    const { data } = await apiClient.post('/login', { email, password });
+    await setToken(data.token);
+    return data;
+  } catch (error: any) {
+    throw error.response?.data as ApiError;
   }
-
-  await setToken(data.token);
-  return data;
 }
 
 export async function apiGetUser(): Promise<User> {
-  const headers = await authHeaders();
-  const res = await fetch(`${API_URL}/user`, { headers });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw data as ApiError;
+  try {
+    const { data } = await apiClient.get('/user');
+    return data;
+  } catch (error: any) {
+    throw error.response?.data as ApiError;
   }
-
-  return data;
 }
 
 export async function apiLogout(): Promise<void> {
-  const headers = await authHeaders();
-  await fetch(`${API_URL}/logout`, {
-    method: 'POST',
-    headers,
-  });
-
-  await removeToken();
+  try {
+    await apiClient.post('/logout');
+    await removeToken();
+  } catch (error: any) {
+    throw error.response?.data as ApiError;
+  }
 }
 
 export { getToken, removeToken };

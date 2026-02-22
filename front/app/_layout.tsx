@@ -3,11 +3,14 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { useToastConfig } from '@/components/CustomToast';
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
+  const toastConfig = useToastConfig();
   const { resolved, colors } = useTheme();
   const segments = useSegments();
   const router = useRouter();
@@ -40,6 +43,7 @@ function AppContent() {
         <Stack.Screen name="(tabs)" />
       </Stack>
       <StatusBar style={resolved === 'dark' ? 'light' : 'dark'} />
+      <Toast config={toastConfig} position="top" topOffset={50} visibilityTime={3000} />
     </>
   );
 }
